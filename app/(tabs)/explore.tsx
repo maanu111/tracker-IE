@@ -1,110 +1,239 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+"use client";
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+  StatusBar,
+  TouchableOpacity,
+} from "react-native";
+import { MaterialIcons as Icon } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { useTheme } from "../../context/ThemeContext";
+import { ThemeToggle } from "../../components/ThemeToggle";
+
+interface SettingItemProps {
+  icon: keyof typeof Icon.glyphMap;
+  title: string;
+  subtitle?: string;
+  onPress?: () => void;
+  showArrow?: boolean;
+}
+
+function SettingItem({
+  icon,
+  title,
+  subtitle,
+  onPress,
+  showArrow = true,
+}: SettingItemProps) {
+  const { colors } = useTheme();
+
+  return (
+    <TouchableOpacity
+      style={[styles.settingItem, { backgroundColor: colors.card }]}
+      onPress={onPress}
+    >
+      <View style={[styles.settingIcon, { backgroundColor: colors.primary }]}>
+        <Icon name={icon} size={20} color="#FFFFFF" />
+      </View>
+      <View style={styles.settingContent}>
+        <Text style={[styles.settingTitle, { color: colors.text }]}>
+          {title}
+        </Text>
+        {subtitle && (
+          <Text
+            style={[styles.settingSubtitle, { color: colors.textSecondary }]}
+          >
+            {subtitle}
+          </Text>
+        )}
+      </View>
+      {showArrow && (
+        <Icon name="chevron-right" size={20} color={colors.textSecondary} />
+      )}
+    </TouchableOpacity>
+  );
+}
 
 export default function TabTwoScreen() {
+  const { colors, actualTheme } = useTheme();
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+      <StatusBar
+        barStyle={actualTheme === "dark" ? "light-content" : "dark-content"}
+        backgroundColor={colors.background}
+      />
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <LinearGradient colors={colors.gradient} style={styles.header}>
+          <Text style={styles.headerTitle}>Settings</Text>
+        </LinearGradient>
+
+        <View style={styles.content}>
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
+          {/* Account Section */}
+          <View style={styles.section}>
+            <Text
+              style={[styles.sectionTitle, { color: colors.textSecondary }]}
+            >
+              ACCOUNT
+            </Text>
+            <SettingItem
+              icon="person"
+              title="Profile"
+              subtitle="Manage your profile information"
+              onPress={() => console.log("Profile pressed")}
+            />
+            <SettingItem
+              icon="security"
+              title="Privacy & Security"
+              subtitle="Control your privacy settings"
+              onPress={() => console.log("Privacy pressed")}
+            />
+            <SettingItem
+              icon="notifications"
+              title="Notifications"
+              subtitle="Manage notification preferences"
+              onPress={() => console.log("Notifications pressed")}
+            />
+          </View>
+
+          {/* App Section */}
+          <View style={styles.section}>
+            <Text
+              style={[styles.sectionTitle, { color: colors.textSecondary }]}
+            >
+              APP
+            </Text>
+            <SettingItem
+              icon="language"
+              title="Language"
+              subtitle="English"
+              onPress={() => console.log("Language pressed")}
+            />
+            <SettingItem
+              icon="currency-exchange"
+              title="Currency"
+              subtitle="USD ($)"
+              onPress={() => console.log("Currency pressed")}
+            />
+            <SettingItem
+              icon="backup"
+              title="Backup & Sync"
+              subtitle="Keep your data safe"
+              onPress={() => console.log("Backup pressed")}
+            />
+          </View>
+
+          {/* Support Section */}
+          <View style={styles.section}>
+            <Text
+              style={[styles.sectionTitle, { color: colors.textSecondary }]}
+            >
+              SUPPORT
+            </Text>
+            <SettingItem
+              icon="help"
+              title="Help & Support"
+              subtitle="Get help when you need it"
+              onPress={() => console.log("Help pressed")}
+            />
+            <SettingItem
+              icon="feedback"
+              title="Send Feedback"
+              subtitle="Help us improve the app"
+              onPress={() => console.log("Feedback pressed")}
+            />
+            <SettingItem
+              icon="info"
+              title="About"
+              subtitle="Version 1.0.0"
+              onPress={() => console.log("About pressed")}
+            />
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+  header: {
+    paddingTop: 20,
+    paddingBottom: 30,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 26,
+    borderBottomRightRadius: 26,
+  },
+  headerTitle: {
+    fontSize: 32, // ↓ from 32
+    fontWeight: "700",
+    color: "#FFFFFF",
+    marginBottom: 4,
+    paddingTop: 20,
+  },
+  headerSubtitle: {
+    fontSize: 12, // ↓ from 16
+    color: "#A5B4FC",
+  },
+  content: {
+    padding: 20,
+  },
+  section: {
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 10, // ↓ from 12
+    fontWeight: "600",
+    letterSpacing: 1,
+    marginBottom: 12,
+    marginLeft: 4,
+  },
+  settingItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 8,
+    borderWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  settingIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 16,
+  },
+  settingContent: {
+    flex: 1,
+  },
+  settingTitle: {
+    fontSize: 13, // ↓ from 16
+    fontWeight: "600",
+    marginBottom: 2,
+  },
+  settingSubtitle: {
+    fontSize: 11, // ↓ from 14
   },
 });
